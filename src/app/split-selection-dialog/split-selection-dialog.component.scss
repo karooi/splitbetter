@@ -1,0 +1,57 @@
+
+.panel {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5rem;
+    font-size: 1.5rem;
+  }
+  .panel-title {
+    margin-left: 1rem;
+    text-align: center;
+  }
+  .confirm-button{
+    margin-left: auto;
+  }
+  .tab-content {
+    padding: 1rem;
+  }
+  mat-form-field {
+    width: 100%;
+    margin-bottom: 1rem;
+  }
+  mat-checkbox{
+    width: 100%;
+  }
+  .user-option {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -webkit-user-drag: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .user-label{
+    width: 100%;
+    display: flex;
+    align-items: center;
+    margin-right: auto !important;
+  }
+  .profile-pic {
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    margin-right: 8px;
+  }
+  
+  .user-select-container {
+    display: flex;
+    align-items: center;
+    padding: 8px;
+
+  }
+ 

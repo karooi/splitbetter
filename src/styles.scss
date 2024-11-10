@@ -1,14 +1,23 @@
-/* You can add global styles to this file, and also import other style files */
-body {
+@use '@angular/material' as mat;
+@use '../m3-theme';
+
+@include mat.core();
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+
+html {
+  // Apply the light theme by default
+  @include mat.core-theme(m3-theme.$light-theme);
+  @include mat.button-theme(m3-theme.$light-theme);
+}
+h2 {
+  display: inline-block;
   margin: 0;
 }
 
-html, body {
-  height: 100%;
-}
+.mat-mdc-dialog-container {
+    --mdc-dialog-container-shape: 0px;
+  }
 
-body {
-  font-family: 'Roboto', sans-serif;
-}
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+  
