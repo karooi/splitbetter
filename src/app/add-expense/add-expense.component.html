@@ -1,0 +1,35 @@
+<div class="add-expense-container">
+    <h2>Add Expense</h2>
+
+    <!-- Group Selection -->
+    <button mat-button (click)="openGroupDialog()">
+      With you and: {{ selectedGroup }}
+    </button>
+
+    <!-- Description Input -->
+    <mat-form-field appearance="fill">
+      <mat-label>Enter a description</mat-label>
+      <input matInput [(ngModel)]="description" placeholder="Enter a description">
+    </mat-form-field>
+
+    <!-- Amount Input -->
+    <mat-form-field appearance="fill">
+      <mat-label>Amount</mat-label>
+      <input matInput type="number" [(ngModel)]="amount" placeholder="0.00">
+    </mat-form-field>
+
+    <!-- Paid By and Split Selection -->
+    <div class="paid-by-split">
+      <span>Paid by</span>
+      <button mat-button (click)="openPayerDialog()">{{ selectedPayer }}</button>
+      <span>and split</span>
+      <button mat-button (click)="openSplitDialog()">{{ selectedSplit }}</button>
+    </div>
+
+    <!-- Footer Icons (Optional) -->
+    <div class="footer-icons">
+      <mat-icon>event</mat-icon>
+      <mat-icon>camera_alt</mat-icon>
+      <mat-icon>edit</mat-icon>
+    </div>
+  </div>
