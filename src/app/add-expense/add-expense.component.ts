@@ -19,8 +19,8 @@ import { User, Group } from '../models/splitwise.model';
 // }
 
 export interface DialogData {
-  creation_method: 'unequal' | 'equal';
-  users: User[];
+  creation_method: 'unequal' | 'equally';
+  users: any[];
   data: number;
 }
 @Component({
@@ -77,7 +77,7 @@ export class AddExpenseComponent {
       width: '100%',
       height: '100%',
       data: {
-        creation_method: 'unequal',
+        creation_method: 'equally',
         users: this.users,
         cost: this.amount,
       },

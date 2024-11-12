@@ -7,7 +7,7 @@ import { catchError } from 'rxjs/operators';
   providedIn: 'root',
 })
 export class ApiService {
-  private apiKey = 'FJd658XSzT2UW6KvPVy3uJHISZcA6rHmCiDMeEIm';
+  private apiKey = '968STYA948sCJsvkihh2RTDpN3E3SqieE0Vod5Pd';
 
   constructor(private http: HttpClient) {}
 
