@@ -3,7 +3,7 @@
 
     <!-- Group Selection -->
     <button mat-button (click)="openGroupDialog()">
-      With you and: {{ selectedGroup }}
+      With you and: {{ selectedGroup ? selectedGroup.name : "select group" }}
     </button>
 
     <!-- Description Input -->

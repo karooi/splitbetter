@@ -9,17 +9,18 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { User, Group } from '../models/splitwise.model';
 
-export interface User {
-  id: number;
-  first_name: string;
-  owed_share: number;
-  selected: Boolean;
-}
+// export interface User {
+//   id: number;
+//   first_name: string;
+//   owed_share: number;
+//   selected: Boolean;
+// }
 
 export interface DialogData {
   creation_method: 'unequal' | 'equal';
-  users: any[];
+  users: User[];
   data: number;
 }
 @Component({
@@ -38,22 +39,25 @@ export interface DialogData {
   styleUrl: './add-expense.component.scss',
 })
 export class AddExpenseComponent {
-  selectedGroup = 'All of Sipidan';
+  selectedGroup?: Group;
   description = '';
   amount: number | null = null;
   selectedPayer = 'you';
   selectedSplit = 'equally';
+  users?: User[] = [];
 
   constructor(private dialog: MatDialog) {}
   ngOnInit(): void {
-    this.amount = 100; this.openSplitDialog()}
+    this.amount = 100;
+    this.openSplitDialog();
+  }
 
   openGroupDialog() {
     const dialogRef = this.dialog.open(GroupSelectionDialog);
     dialogRef.afterClosed().subscribe((result) => {
-      console.log(result);
       if (result) {
         this.selectedGroup = result;
+        this.users = this.selectedGroup?.members;
       }
     });
   }
@@ -64,35 +68,9 @@ export class AddExpenseComponent {
       if (result) this.selectedPayer = result;
     });
   }
-  users = [
-    {
-      "id": 51419209,
-      "first_name": "Kurt",
-      "last_name": null,
-      "picture": {
-          "small": "https://s3.amazonaws.com/splitwise/uploads/user/default_avatars/avatar-ruby35-50px.png",
-          "medium": "https://s3.amazonaws.com/splitwise/uploads/user/default_avatars/avatar-ruby35-100px.png",
-          "large": "https://s3.amazonaws.com/splitwise/uploads/user/default_avatars/avatar-ruby35-200px.png"
-      },
-      "email": "kurtlooi@hotmail.com",
-      "owed_share": 50,
-  },
-  {
-      "id": 96762518,
-      "first_name": "ricardojack96",
-      "last_name": null,
-      "picture": {
-          "small": "https://s3.amazonaws.com/splitwise/uploads/user/default_avatars/avatar-orange47-50px.png",
-          "medium": "https://s3.amazonaws.com/splitwise/uploads/user/default_avatars/avatar-orange47-100px.png",
-          "large": "https://s3.amazonaws.com/splitwise/uploads/user/default_avatars/avatar-orange47-200px.png"
-      },
-      "email": "ricardojack96@gmail.com",
-      "owed_share": 50,
-  },
-  ];
 
   openSplitDialog(): void {
-    console.log(this.amount)
+    console.log(this.amount);
     const dialogRef = this.dialog.open(SplitSelectionDialog, {
       maxWidth: '100vw',
       maxHeight: '100vh',
@@ -101,8 +79,8 @@ export class AddExpenseComponent {
       data: {
         creation_method: 'unequal',
         users: this.users,
-        cost: this.amount
-      }
+        cost: this.amount,
+      },
     });
 
     dialogRef.afterClosed().subscribe((result: DialogData) => {
