@@ -14,6 +14,7 @@ import { FormsModule } from '@angular/forms';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatRipple, MatRippleModule } from '@angular/material/core';
 import { MatListModule } from '@angular/material/list';
+import { Subscription } from 'rxjs';
 
 export interface User {
   id: number;
@@ -54,6 +55,8 @@ export class SplitSelectionDialog {
   selectedTab: number = 0;
   selectAllChecked = false;
   totalAmount: number = 0;
+  selectedTabChangeSubscription: Subscription = new Subscription();
+  selectedUsers=[]
   constructor(
     public dialogRef: MatDialogRef<SplitSelectionDialog>,
     @Inject(MAT_DIALOG_DATA) public data: DialogData
@@ -63,18 +66,19 @@ export class SplitSelectionDialog {
     this.selectedTab = this.data.creation_method === 'equally' ? 0 : 1;
     this.data.users.forEach((user) => (user.selected = user.owed_share > 0));
     this.totalAmount = this.data.cost;
-    this.remainingAmount = this.totalAmount;
     this.remainingPercentage = 100;
-    if (this.selectedTab == 0) {
-      this.updateEqualSplit(this.data.users.filter((user) => user.selected));
-    } else {
-      this.updateRemainingAmount();
-    }
+    this.onTabChange();
+    this.selectedTabChangeSubscription = this.dialogRef.afterOpened().subscribe(() => {
+      this.onTabChange();
+    });
   }
 
   onTabChange(): void {
-    if (this.selectedTab === 0) {
-      this.updateEqualSplit(this.data.users);
+    if (this.selectedTab == 0) {
+      this.updateEqualSplit(this.data.users.filter((user) => user.selected));
+    } else {
+      console.log('hi')
+      this.updateRemainingAmount();
     }
   }
   get users() {
@@ -103,6 +107,9 @@ export class SplitSelectionDialog {
 
   onConfirm(): void {
     // Confirm button will pass the updated data back to the parent component
+    this.selectedUsers.forEach((user: string) => {
+      this.data.users[0].owed_share = this.equalAmount;
+    });
     this.data.creation_method = this.selectedTab === 0 ? 'equally' : 'unequal';
     this.dialogRef.close(this.data);
   }
@@ -114,14 +121,12 @@ export class SplitSelectionDialog {
   }
 
   updateEqualSplit(users: any) {
-    const selectedUsers = users;
+    this.selectedUsers = users;
     this.equalAmount =
-      selectedUsers.length > 0 ? this.data.cost / selectedUsers.length : 0;
+      this.selectedUsers.length > 0 ? this.data.cost / this.selectedUsers.length : 0;
     this.selectAllChecked = this.data.users.every((user) => user.selected);
-    selectedUsers.forEach((user: string) => {
-      this.data.users[0].owed_share = this.equalAmount;
-    });
   }
+
   getDisplayName(user: any): string {
     return (user.first_name || '') + ' ' + (user.last_name || '') || user.email;
   }

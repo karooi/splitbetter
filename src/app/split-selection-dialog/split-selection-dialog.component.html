@@ -17,7 +17,6 @@
 <!-- Material Tabs for different split types -->
 <mat-tab-group
   [(selectedIndex)]="selectedTab"
-  (change)="onTabChange()"
   [animationDuration]="0"
   class="custom-tabs"
 >
@@ -91,12 +90,16 @@
                 class="profile-pic"
               />
               <div>{{ getDisplayName(user) }}</div>
-              <mat-form-field class="user-amount" [style.width.px]="50">
+              <mat-form-field
+                subscriptSizing="dynamic"
+                class="user-amount dense-10"
+                [style.width.px]="(user.owed_share || 0).toString().length * 9 + 40"
+              >
                 <input
                   matInput
                   type="number"
                   [(ngModel)]="user.owed_share"
-                  (input)="updateRemainingAmount()"
+                  placeholder="0"
                 />
               </mat-form-field>
             </div>
@@ -104,8 +107,18 @@
         </mat-list>
       </div>
       <div class="tab-footer">
-        <span class="tab-footer-el remaining-amount">
-          Remaining: {{ remainingAmount | number : "1.2-2" }}
+        <span
+          class="tab-footer-el flex-column justify-content-between"
+          style="flex: 1"
+        >
+          <span class="fw-bold">
+            SGD{{ totalAmount-remainingAmount | number : "1.2-2" }} of SGD{{
+              totalAmount | number : "1.2-2"
+            }}
+          </span>
+            <span
+              >SGD {{ remainingAmount | number : "1.2-2" }} left</span
+            >
         </span>
       </div>
     </div>

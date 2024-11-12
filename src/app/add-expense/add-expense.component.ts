@@ -10,13 +10,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { User, Group } from '../models/splitwise.model';
-
-// export interface User {
-//   id: number;
-//   first_name: string;
-//   owed_share: number;
-//   selected: Boolean;
-// }
+import { SplitwiseService } from '../splitwise.service';
 
 export interface DialogData {
   creation_method: 'unequal' | 'equally';
@@ -40,16 +34,20 @@ export interface DialogData {
 })
 export class AddExpenseComponent {
   selectedGroup?: Group;
+  currentUser?: User;
   description = '';
   amount: number | null = null;
   selectedPayer = 'you';
   selectedSplit = 'equally';
-  users?: User[] = [];
+  users: User[] = [];
 
-  constructor(private dialog: MatDialog) {}
+  constructor(private dialog: MatDialog, private splitwiseService: SplitwiseService) {}
   ngOnInit(): void {
     this.amount = 100;
-    this.openSplitDialog();
+    this.splitwiseService.getCurrentUser().subscribe((data) => {
+      this.currentUser=data.user;
+      this.openSplitDialog();
+    });
   }
 
   openGroupDialog() {
@@ -57,7 +55,7 @@ export class AddExpenseComponent {
     dialogRef.afterClosed().subscribe((result) => {
       if (result) {
         this.selectedGroup = result;
-        this.users = this.selectedGroup?.members;
+        this.users = this.selectedGroup?.members || [];
       }
     });
   }
@@ -69,35 +67,8 @@ export class AddExpenseComponent {
     });
   }
 
-  users1 = [
-    {
-      "id": 51419209,
-      "first_name": "Kurt",
-      "last_name": null,
-      "picture": {
-          "small": "https://s3.amazonaws.com/splitwise/uploads/user/default_avatars/avatar-ruby35-50px.png",
-          "medium": "https://s3.amazonaws.com/splitwise/uploads/user/default_avatars/avatar-ruby35-100px.png",
-          "large": "https://s3.amazonaws.com/splitwise/uploads/user/default_avatars/avatar-ruby35-200px.png"
-      },
-      "email": "kurtlooi@hotmail.com",
-      "owed_share": 50,
-  },
-  {
-      "id": 96762518,
-      "first_name": "ricardojack96",
-      "last_name": null,
-      "picture": {
-          "small": "https://s3.amazonaws.com/splitwise/uploads/user/default_avatars/avatar-orange47-50px.png",
-          "medium": "https://s3.amazonaws.com/splitwise/uploads/user/default_avatars/avatar-orange47-100px.png",
-          "large": "https://s3.amazonaws.com/splitwise/uploads/user/default_avatars/avatar-orange47-200px.png"
-      },
-      "email": "ricardojack96@gmail.com",
-      "owed_share": 50,
-  },
-  ];
-
   openSplitDialog(): void {
-    console.log(this.amount);
+    this.users = this.users.length === 0 ? (this.currentUser ? [this.currentUser] : []) : this.users;
     const dialogRef = this.dialog.open(SplitSelectionDialog, {
       maxWidth: '100vw',
       maxHeight: '100vh',
@@ -105,7 +76,7 @@ export class AddExpenseComponent {
       height: '100%',
       data: {
         creation_method: 'equally',
-        users: this.users1,
+        users: this.users,
         cost: this.amount,
       },
     });
