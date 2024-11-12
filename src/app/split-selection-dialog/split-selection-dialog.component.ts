@@ -53,16 +53,23 @@ export class SplitSelectionDialog {
   equalAmount: number = 0;
   selectedTab: number = 0;
   selectAllChecked = false;
+  totalAmount: number = 0;
   constructor(
     public dialogRef: MatDialogRef<SplitSelectionDialog>,
     @Inject(MAT_DIALOG_DATA) public data: DialogData
   ) {}
 
   ngOnInit(): void {
-    console.log(this.data)
     this.selectedTab = this.data.creation_method === 'equally' ? 0 : 1;
     this.data.users.forEach((user) => (user.selected = user.owed_share > 0));
-    this.selectAllChecked = this.data.users.every((user) => user.selected);
+    this.totalAmount = this.data.cost;
+    this.remainingAmount = this.totalAmount;
+    this.remainingPercentage = 100;
+    if (this.selectedTab == 0) {
+      this.updateEqualSplit(this.data.users.filter((user) => user.selected));
+    } else {
+      this.updateRemainingAmount();
+    }
   }
 
   onTabChange(): void {
@@ -103,11 +110,11 @@ export class SplitSelectionDialog {
   toggleSelectAll(event: any) {
     this.selectAllChecked = event.checked;
     this.data.users.forEach((user) => (user.selected = this.selectAllChecked));
-    this.updateEqualSplit(this.data.users);
+    this.updateEqualSplit(this.data.users.filter((user) => user.selected));
   }
 
   updateEqualSplit(users: any) {
-    const selectedUsers = users.selectedOptions.selected;
+    const selectedUsers = users;
     this.equalAmount =
       selectedUsers.length > 0 ? this.data.cost / selectedUsers.length : 0;
     this.selectAllChecked = this.data.users.every((user) => user.selected);
@@ -117,5 +124,13 @@ export class SplitSelectionDialog {
   }
   getDisplayName(user: any): string {
     return (user.first_name || '') + ' ' + (user.last_name || '') || user.email;
+  }
+
+  updateRemainingAmount() {
+    const totalAllocated = this.data.users.reduce(
+      (sum, user) => sum + (user.owed_share || 0),
+      0
+    );
+    this.remainingAmount = this.totalAmount - totalAllocated;
   }
 }

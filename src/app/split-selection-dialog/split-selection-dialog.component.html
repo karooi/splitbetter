@@ -30,7 +30,9 @@
           <p>Selected users owe the same amount.</p>
         </div>
         <mat-selection-list
-          (selectionChange)="updateEqualSplit(equalUsers)"
+          (selectionChange)="
+            updateEqualSplit(equalUsers.selectedOptions.selected)
+          "
           #equalUsers
         >
           <mat-list-option
@@ -60,7 +62,6 @@
           >
           <span>({{ equalUsers.selectedOptions.selected.length }} person)</span>
         </span>
-
         <mat-checkbox
           [(ngModel)]="selectAllChecked"
           (change)="toggleSelectAll($event)"
@@ -76,15 +77,36 @@
   <!-- Unequally Tab -->
   <mat-tab label="Unequally">
     <div class="tab-content">
-      <h3>Unequal Split</h3>
-      <p>
-        Specify the exact amount for each user, showing the remaining amount.
-      </p>
-      <div *ngFor="let user of users; let i = index">
-        <mat-form-field appearance="outline">
-          <mat-label>Amount for {{ user.first_name }}</mat-label>
-          <input matInput type="number" [(ngModel)]="users[i].owed_share" />
-        </mat-form-field>
+      <div class="scrollable-list">
+        <div class="tab-title">
+          <p class="fw-bold">Split Unequally</p>
+          <p>Specify the exact amount each user owes.</p>
+        </div>
+        <mat-list>
+          <mat-list-item *ngFor="let user of data.users" class="user-option">
+            <div class="user-label">
+              <img
+                [src]="user.picture?.small"
+                alt="Profile"
+                class="profile-pic"
+              />
+              <div>{{ getDisplayName(user) }}</div>
+              <mat-form-field class="user-amount" [style.width.px]="50">
+                <input
+                  matInput
+                  type="number"
+                  [(ngModel)]="user.owed_share"
+                  (input)="updateRemainingAmount()"
+                />
+              </mat-form-field>
+            </div>
+          </mat-list-item>
+        </mat-list>
+      </div>
+      <div class="tab-footer">
+        <span class="tab-footer-el remaining-amount">
+          Remaining: {{ remainingAmount | number : "1.2-2" }}
+        </span>
       </div>
     </div>
   </mat-tab>

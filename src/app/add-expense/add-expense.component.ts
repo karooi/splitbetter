@@ -69,6 +69,33 @@ export class AddExpenseComponent {
     });
   }
 
+  users1 = [
+    {
+      "id": 51419209,
+      "first_name": "Kurt",
+      "last_name": null,
+      "picture": {
+          "small": "https://s3.amazonaws.com/splitwise/uploads/user/default_avatars/avatar-ruby35-50px.png",
+          "medium": "https://s3.amazonaws.com/splitwise/uploads/user/default_avatars/avatar-ruby35-100px.png",
+          "large": "https://s3.amazonaws.com/splitwise/uploads/user/default_avatars/avatar-ruby35-200px.png"
+      },
+      "email": "kurtlooi@hotmail.com",
+      "owed_share": 50,
+  },
+  {
+      "id": 96762518,
+      "first_name": "ricardojack96",
+      "last_name": null,
+      "picture": {
+          "small": "https://s3.amazonaws.com/splitwise/uploads/user/default_avatars/avatar-orange47-50px.png",
+          "medium": "https://s3.amazonaws.com/splitwise/uploads/user/default_avatars/avatar-orange47-100px.png",
+          "large": "https://s3.amazonaws.com/splitwise/uploads/user/default_avatars/avatar-orange47-200px.png"
+      },
+      "email": "ricardojack96@gmail.com",
+      "owed_share": 50,
+  },
+  ];
+
   openSplitDialog(): void {
     console.log(this.amount);
     const dialogRef = this.dialog.open(SplitSelectionDialog, {
@@ -78,7 +105,7 @@ export class AddExpenseComponent {
       height: '100%',
       data: {
         creation_method: 'equally',
-        users: this.users,
+        users: this.users1,
         cost: this.amount,
       },
     });

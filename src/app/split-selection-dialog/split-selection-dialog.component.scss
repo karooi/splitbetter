@@ -17,10 +17,7 @@
   display: flex;
   flex-direction: column;
 }
-mat-form-field {
-  width: 100%;
-  margin-bottom: 1rem;
-}
+
 mat-checkbox {
   width: 100%;
 }
@@ -40,7 +37,6 @@ mat-checkbox {
   width: 100%;
   display: flex;
   align-items: center;
-  margin-right: auto !important;
 }
 .profile-pic {
   border-radius: 50%;
@@ -92,4 +88,12 @@ mat-checkbox {
 .scrollable-list {
   flex: 1 1;
   overflow-y: auto;
+}
+.user-amount {
+  display: flex;
+  margin-left: auto;
+  align-self: end;
+}
+::ng-deep mat-mdc-form-field-infix {
+  padding: 0 !important;
 }
