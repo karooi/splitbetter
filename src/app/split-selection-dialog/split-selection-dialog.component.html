@@ -1,64 +1,107 @@
 <!-- Panel with Adjust Split -->
 <div class="panel" mat-dialog-title>
-    <button mat-icon-button (click)="onBack()">
-      <mat-icon>arrow_back</mat-icon>
-    </button>
-    <span class="panel-title">Adjust Split</span>
-    <button class="confirm-button" mat-icon-button [mat-dialog-close]="data" (click)="onConfirm()">
-      <mat-icon>check</mat-icon>
-    </button>
-    
-  </div>
-  
-  <!-- Material Tabs for different split types -->
-  <mat-tab-group [(selectedIndex)]="selectedTab" (change)="onTabChange()">
-    <!-- Equally Tab -->
-    <mat-tab label="Equally">
-        <div class="tab-content">
-          <h3>Split equally</h3>
-          <p>All selected users owe the same amount.</p>
-          <div *ngFor="let user of data.users"  class="user-option"  >
-            <mat-checkbox class="user-checkbox" [(ngModel)]="user.selected" (change)="updateEqualSplit()" labelPosition="before" matRipple>
-              <div class="user-label">
-                <img [src]="user.picture?.small " alt="Profile Picture" class="profile-pic">
-                <span>{{ getDisplayName(user) }}</span>
-              </div>
-            </mat-checkbox>
-          </div>
-          <span> {{ equalAmount | number: '1.2-2' }} /person</span>
-          <mat-checkbox [(ngModel)]="selectAllChecked" (change)="toggleSelectAll($event)">
-              All
-            </mat-checkbox>
+  <button mat-icon-button (click)="onBack()">
+    <mat-icon>arrow_back</mat-icon>
+  </button>
+  <span class="panel-title">Adjust Split</span>
+  <button
+    class="confirm-button"
+    mat-icon-button
+    [mat-dialog-close]="data"
+    (click)="onConfirm()"
+  >
+    <mat-icon>check</mat-icon>
+  </button>
+</div>
+
+<!-- Material Tabs for different split types -->
+<mat-tab-group
+  [(selectedIndex)]="selectedTab"
+  (change)="onTabChange()"
+  [animationDuration]="0"
+  class="custom-tabs"
+>
+  <!-- Equally Tab -->
+  <mat-tab label="Equally">
+    <div class="tab-content">
+      <div class="scrollable-list">
+        <div class="tab-title">
+          <p class="fw-bold">Split equally</p>
+          <p>Selected users owe the same amount.</p>
         </div>
-      </mat-tab>
-  
-    <!-- Unequally Tab -->
-    <mat-tab label="Unequally">
-      <div class="tab-content">
-        <h3>Unequal Split</h3>
-        <p>Specify the exact amount for each user, showing the remaining amount.</p>
-        <div *ngFor="let user of users; let i = index">
-          <mat-form-field appearance="outline">
-            <mat-label>Amount for {{ user.first_name }}</mat-label>
-            <input matInput type="number" [(ngModel)]="users[i].owed_share">
-          </mat-form-field>
-        </div>
+        <mat-selection-list
+          (selectionChange)="updateEqualSplit(equalUsers)"
+          #equalUsers
+        >
+          <mat-list-option
+            *ngFor="let user of data.users"
+            [value]="user"
+            [selected]="user.selected"
+            class="user-option"
+          >
+            <div class="user-label">
+              <img
+                [src]="user.picture?.small"
+                alt="Profile"
+                class="profile-pic"
+              />
+              <div>{{ getDisplayName(user) }}</div>
+            </div>
+          </mat-list-option>
+        </mat-selection-list>
       </div>
-    </mat-tab>
-  
-    <!-- Percentage Tab -->
-    <mat-tab label="Percentage">
-      <div class="tab-content">
-        <h3>Percentage Split</h3>
-        <p>Allocate a percentage for each user, showing the remaining percentage.</p>
-        <div *ngFor="let user of users; let i = index">
-          <mat-form-field appearance="outline">
-            <mat-label>Percentage for {{ user.first_name }}</mat-label>
-            <input matInput type="number" [(ngModel)]="users[i].owed_share">
-          </mat-form-field>
-        </div>
+      <div class="tab-footer">
+        <span
+          class="tab-footer-el flex-column justify-content-between"
+          style="flex: 1"
+        >
+          <span class="fw-bold"
+            >{{ equalAmount | number : "1.2-2" }} /person</span
+          >
+          <span>({{ equalUsers.selectedOptions.selected.length }} person)</span>
+        </span>
+
+        <mat-checkbox
+          [(ngModel)]="selectAllChecked"
+          (change)="toggleSelectAll($event)"
+          class="tab-footer-el select-all-checkbox"
+          [labelPosition]="'before'"
+        >
+          All
+        </mat-checkbox>
       </div>
-    </mat-tab>
-  </mat-tab-group>
-  
-  
+    </div>
+  </mat-tab>
+
+  <!-- Unequally Tab -->
+  <mat-tab label="Unequally">
+    <div class="tab-content">
+      <h3>Unequal Split</h3>
+      <p>
+        Specify the exact amount for each user, showing the remaining amount.
+      </p>
+      <div *ngFor="let user of users; let i = index">
+        <mat-form-field appearance="outline">
+          <mat-label>Amount for {{ user.first_name }}</mat-label>
+          <input matInput type="number" [(ngModel)]="users[i].owed_share" />
+        </mat-form-field>
+      </div>
+    </div>
+  </mat-tab>
+
+  <!-- Percentage Tab -->
+  <mat-tab label="Percentage">
+    <div class="tab-content">
+      <h3>Percentage Split</h3>
+      <p>
+        Allocate a percentage for each user, showing the remaining percentage.
+      </p>
+      <div *ngFor="let user of users; let i = index">
+        <mat-form-field appearance="outline">
+          <mat-label>Percentage for {{ user.first_name }}</mat-label>
+          <input matInput type="number" [(ngModel)]="users[i].owed_share" />
+        </mat-form-field>
+      </div>
+    </div>
+  </mat-tab>
+</mat-tab-group>

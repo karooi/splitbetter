@@ -18,7 +18,7 @@ export interface User {
 }
 
 export interface DialogData {
-  creation_method: 'unequal' | 'equal';
+  creation_method: 'unequal' | 'equally';
   users: any[];
   data: number;
 }
@@ -99,7 +99,7 @@ export class AddExpenseComponent {
       width: '100%',
       height: '100%',
       data: {
-        creation_method: 'unequal',
+        creation_method: 'equally',
         users: this.users,
         cost: this.amount
       }
