@@ -1,0 +1,15 @@
+<div class="panel" mat-dialog-title>
+  <button mat-icon-button (click)="onBack()">
+    <mat-icon>arrow_back</mat-icon>
+  </button>
+  <span class="panel-title">Who paid?</span>
+  <button
+    class="confirm-button"
+    mat-icon-button
+    [mat-dialog-close]="data"
+    (click)="onConfirm()"
+  >
+    <mat-icon>check</mat-icon>
+  </button>
+</div>
+<mat-calendar [(selected)]="selectedDate"></mat-calendar>

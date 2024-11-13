@@ -1,1 +1,113 @@
-<p>payer-selection-dialog works!</p>
+<div class="panel" mat-dialog-title>
+  <button mat-icon-button (click)="onBack()">
+    <mat-icon>arrow_back</mat-icon>
+  </button>
+  <span class="panel-title">Who paid?</span>
+  <button
+    class="confirm-button"
+    mat-icon-button
+    [mat-dialog-close]="data"
+    (click)="onConfirm()"
+  >
+    <mat-icon>check</mat-icon>
+  </button>
+</div>
+
+@if (!multipleSelection) {
+  <div class="tab-content">
+    <div class="scrollable-list">
+      <mat-selection-list
+      (selectionChange)="
+        updatePayersOption(payers.selectedOptions.selected)
+      "
+        #payers
+      >
+        <mat-list-option
+          *ngFor="let user of data.users"
+          [value]="user"
+          [selected]="this.payerMapping.has(user.id)"
+          class="user-option"
+        >
+          <div class="user-label">
+            <img
+              [src]="user.picture?.small"
+              alt="Profile"
+              class="profile-pic"
+            />
+            <div>{{ getDisplayName(user) }}</div>
+          </div>
+        </mat-list-option>
+      </mat-selection-list>
+      <button mat-button (click)="toggleMultipleSelection()">Multiple selection</button>
+    </div>
+    <div class="tab-footer">
+      <span
+        class="tab-footer-el flex-column justify-content-between"
+        style="flex: 1"
+      >
+        <span class="fw-bold"
+          >{{ payers.selectedOptions.selected.length === 0 ? 0 :  this.data.cost/payers.selectedOptions.selected.length | number : "1.2-2" }} /person</span
+        >
+        <span class="fw-bold"
+          >1 /person</span
+        >
+        <span>({{ payers.selectedOptions.selected.length }} person)</span>
+      </span>
+      <mat-checkbox
+      [(ngModel)]="selectAllChecked"
+      (change)="toggleSelectAll($event)"
+      class="tab-footer-el select-all-checkbox"
+      [labelPosition]="'before'"
+      >
+        All
+      </mat-checkbox>
+    </div>
+  </div>
+}
+@else {
+  <div class="tab-content">
+    <div class="scrollable-list">
+      <mat-list>
+        <mat-list-item *ngFor="let user of data.users" class="user-option">
+          <div class="user-label">
+            <img
+              [src]="user.picture?.small"
+              alt="Profile"
+              class="profile-pic"
+            />
+            <div>{{ getDisplayName(user) }}</div>
+            <mat-form-field
+              subscriptSizing="dynamic"
+              class="user-amount dense-10"
+              [style.width.px]="(user.owed_share || 0).toString().length * 9 + 40"
+            >
+              <input
+                matInput
+                type="number"
+                [ngModel]="getPayerShare(user.id)"
+                (ngModelChange)="setPayerShare(user, $event)"
+                placeholder="0"
+              />
+            </mat-form-field>
+          </div>
+        </mat-list-item>
+      </mat-list>
+      <button mat-button (click)="toggleMultipleSelection()">Equal selection</button>
+    </div>
+    <div class="tab-footer">
+      <span
+        class="tab-footer-el flex-column justify-content-between"
+        style="flex: 1"
+      >
+        <span class="fw-bold">
+          {{ this.totalAmount| number : "1.2-2" }} of {{
+            this.data.cost | number : "1.2-2"
+          }}
+        </span>
+          <span
+            > {{ this.data.cost-this.totalAmount | number : "1.2-2" }} left</span
+          >
+      </span>
+    </div>
+  </div>
+}

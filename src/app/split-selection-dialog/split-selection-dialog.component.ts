@@ -56,7 +56,7 @@ export class SplitSelectionDialog {
   selectAllChecked = false;
   totalAmount: number = 0;
   selectedTabChangeSubscription: Subscription = new Subscription();
-  selectedUsers=[]
+  selectedUsers = [];
   constructor(
     public dialogRef: MatDialogRef<SplitSelectionDialog>,
     @Inject(MAT_DIALOG_DATA) public data: DialogData
@@ -68,16 +68,18 @@ export class SplitSelectionDialog {
     this.totalAmount = this.data.cost;
     this.remainingPercentage = 100;
     this.onTabChange();
-    this.selectedTabChangeSubscription = this.dialogRef.afterOpened().subscribe(() => {
-      this.onTabChange();
-    });
+    this.selectedTabChangeSubscription = this.dialogRef
+      .afterOpened()
+      .subscribe(() => {
+        this.onTabChange();
+      });
   }
 
   onTabChange(): void {
     if (this.selectedTab == 0) {
       this.updateEqualSplit(this.data.users.filter((user) => user.selected));
     } else {
-      console.log('hi')
+      console.log('hi');
       this.updateRemainingAmount();
     }
   }
@@ -123,7 +125,9 @@ export class SplitSelectionDialog {
   updateEqualSplit(users: any) {
     this.selectedUsers = users;
     this.equalAmount =
-      this.selectedUsers.length > 0 ? this.data.cost / this.selectedUsers.length : 0;
+      this.selectedUsers.length > 0
+        ? this.data.cost / this.selectedUsers.length
+        : 0;
     this.selectAllChecked = this.data.users.every((user) => user.selected);
   }
 

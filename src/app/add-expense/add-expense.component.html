@@ -21,14 +21,16 @@
     <!-- Paid By and Split Selection -->
     <div class="paid-by-split">
       <span>Paid by</span>
-      <button mat-button (click)="openPayerDialog()">{{ selectedPayer }}</button>
+      <button mat-button (click)="openPayerDialog()">{{ getSelectedPayers() }}</button>
       <span>and split</span>
       <button mat-button (click)="openSplitDialog()">{{ selectedSplit }}</button>
     </div>
 
     <!-- Footer Icons (Optional) -->
     <div class="footer-icons">
-      <mat-icon>event</mat-icon>
+      <button mat-icon-button (click)="openDatePicker()">
+        <mat-icon>calendar_today</mat-icon>
+      </button>    
       <mat-icon>camera_alt</mat-icon>
       <mat-icon>edit</mat-icon>
     </div>

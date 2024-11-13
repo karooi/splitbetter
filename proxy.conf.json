@@ -3,7 +3,6 @@
     "target": "https://secure.splitwise.com/api/v3.0",
     "secure": true,
     "changeOrigin": true,
-    "logLevel": "debug",  // Log proxy activity to help with debugging
     "pathRewrite": {
       "^/api": ""
     }

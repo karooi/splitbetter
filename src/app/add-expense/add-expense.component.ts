@@ -11,6 +11,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { User, Group } from '../models/splitwise.model';
 import { SplitwiseService } from '../splitwise.service';
+import { DatePickerDialogComponent } from '../date-picker-dialog/date-picker-dialog.component';
 
 export interface DialogData {
   creation_method: 'unequal' | 'equally';
@@ -37,15 +38,20 @@ export class AddExpenseComponent {
   currentUser?: User;
   description = '';
   amount: number | null = null;
-  selectedPayer = 'you';
+  payerMapping: Map<number, number> = new Map();
+  selectedPayers: User[] = [];
   selectedSplit = 'equally';
   users: User[] = [];
+  selectedDate: Date | null = null;
 
-  constructor(private dialog: MatDialog, private splitwiseService: SplitwiseService) {}
+  constructor(
+    private dialog: MatDialog,
+    private splitwiseService: SplitwiseService
+  ) {}
   ngOnInit(): void {
     this.amount = 100;
     this.splitwiseService.getCurrentUser().subscribe((data) => {
-      this.currentUser=data.user;
+      this.currentUser = data.user;
       this.openSplitDialog();
     });
   }
@@ -61,14 +67,33 @@ export class AddExpenseComponent {
   }
 
   openPayerDialog() {
-    const dialogRef = this.dialog.open(PayerSelectionDialogComponent);
+    const dialogRef = this.dialog.open(PayerSelectionDialogComponent, {
+      width: '100vw',
+      height: '100vh',
+      maxWidth: '100vw', // Ensures the dialog doesn't exceed the screen width
+      panelClass: 'full-screen-dialog', // Optional for additional styling
+      data: {
+        users: this.users,
+        cost: this.amount,
+      },
+    });
     dialogRef.afterClosed().subscribe((result) => {
-      if (result) this.selectedPayer = result;
+      if (result) {
+        this.payerMapping = result;
+        this.selectedPayers = this.users.filter((user) =>
+          this.payerMapping.has(user.id)
+        );
+      }
     });
   }
 
   openSplitDialog(): void {
-    this.users = this.users.length === 0 ? (this.currentUser ? [this.currentUser] : []) : this.users;
+    this.users =
+      this.users.length === 0
+        ? this.currentUser
+          ? [this.currentUser]
+          : []
+        : this.users;
     const dialogRef = this.dialog.open(SplitSelectionDialog, {
       maxWidth: '100vw',
       maxHeight: '100vh',
@@ -88,5 +113,27 @@ export class AddExpenseComponent {
         console.log('Creation method:', result.creation_method);
       }
     });
+  }
+
+  openDatePicker() {
+    const dialogRef = this.dialog.open(DatePickerDialogComponent, {
+      maxWidth: '100vw',
+      maxHeight: '100vh',
+      width: '100%',
+      height: '100%',
+      data: { date: this.selectedDate },
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result) {
+        this.selectedDate = result;
+      }
+    });
+  }
+
+  getSelectedPayers(): string {
+    return this.selectedPayers.length > 0
+      ? this.selectedPayers.map((payer) => payer.first_name).join(',')
+      : 'you';
   }
 }
