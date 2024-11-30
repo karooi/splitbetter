@@ -76,3 +76,9 @@ export interface NotificationSource {
   group: Group;
   expense: Expense;
 }
+
+export interface Currency {
+  currency_code: string;
+  unit: string;
+}
+

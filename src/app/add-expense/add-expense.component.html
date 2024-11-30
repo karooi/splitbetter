@@ -8,7 +8,6 @@
 
   <!-- Description Input -->
   <mat-form-field appearance="fill">
-    <mat-label>Enter a description</mat-label>
     <input
       matInput
       [(ngModel)]="description"
@@ -18,8 +17,10 @@
 
   <!-- Amount Input -->
   <mat-form-field appearance="fill">
-    <mat-label>Amount</mat-label>
     <input matInput type="number" [(ngModel)]="amount" placeholder="0.00" />
+    <button mat-button (click)="openCurrencyDialog()" matSuffix>
+      {{ selectedCurrency.currency_code }}
+    </button>
   </mat-form-field>
 
   <!-- Paid By and Split Selection -->

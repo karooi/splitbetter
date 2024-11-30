@@ -10,6 +10,12 @@ export class SplitwiseService {
   private apiUrl = '/api/';
 
   constructor(private apiService: ApiService) {}
+  getCurrencies(): Observable<any> {
+    return this.apiService.get(
+      `${this.apiUrl}get_currencies`,
+      this.apiService.getHeaders()
+    );
+  }
 
   getCurrentUser(): Observable<any> {
     return this.apiService.get(

@@ -25,7 +25,7 @@ export interface User {
 }
 
 export interface DialogData {
-  creation_method: 'unequal' | 'equally';
+  creation_method: 'unequally' | 'equally';
   selectedSplit: any[];
   users: any[];
   cost: number;
@@ -152,7 +152,8 @@ export class SplitSelectionDialog {
         return;
       }
     }
-    this.data.creation_method = this.selectedTab === 0 ? 'equally' : 'unequal';
+    this.data.creation_method =
+      this.selectedTab === 0 ? 'equally' : 'unequally';
     this.data.selectedSplit = this.selectedSplit;
     this.dialogRef.close(this.data);
   }
@@ -214,11 +215,10 @@ export class SplitSelectionDialog {
 
   updateRemainingAmount() {
     const totalAllocated = parseFloat(
-      this.selectedSplit.reduce(
-        (sum, split) => sum + (split.owed_share || 0),
-        0
-      )
-    ).toFixed(2);
+      this.selectedSplit
+        .reduce((sum, split) => sum + (parseFloat(split.owed_share) || 0), 0)
+        .toFixed(2)
+    );
     this.remainingAmount = parseFloat(
       (this.totalAmount - totalAllocated).toFixed(2)
     );

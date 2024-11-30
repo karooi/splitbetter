@@ -9,9 +9,10 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { User, Group } from '../models/splitwise.model';
+import { User, Group, Currency } from '../models/splitwise.model';
 import { SplitwiseService } from '../splitwise.service';
 import { DatePickerDialogComponent } from '../date-picker-dialog/date-picker-dialog.component';
+import { CurrencySelectionDialog } from '../currency-selection/currency-selection-dialog.component';
 
 export interface DialogData {
   selectedSplit: any[];
@@ -45,6 +46,7 @@ export class AddExpenseComponent {
   selectedDate: Date | null = null;
   selectedSplit: any[] = [];
   creation_method: string = 'equally';
+  selectedCurrency: Currency = { currency_code: 'SGD', unit: 'SGD' };
   constructor(
     private dialog: MatDialog,
     private splitwiseService: SplitwiseService
@@ -53,7 +55,6 @@ export class AddExpenseComponent {
     this.amount = 100;
     this.splitwiseService.getCurrentUser().subscribe((data) => {
       this.currentUser = data.user;
-      this.openSplitDialog();
     });
   }
 
@@ -63,7 +64,17 @@ export class AddExpenseComponent {
       if (result) {
         this.selectedGroup = result;
         this.users = this.selectedGroup?.members || [];
+        //reset selected split
         this.selectedSplit = [];
+      }
+    });
+  }
+
+  openCurrencyDialog() {
+    const dialogRef = this.dialog.open(CurrencySelectionDialog);
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result) {
+        this.selectedCurrency = result;
       }
     });
   }
