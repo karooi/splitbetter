@@ -15,6 +15,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatRipple, MatRippleModule } from '@angular/material/core';
 import { MatListModule } from '@angular/material/list';
 import { Subscription } from 'rxjs';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 export interface User {
   id: number;
@@ -25,6 +26,7 @@ export interface User {
 
 export interface DialogData {
   creation_method: 'unequal' | 'equally';
+  selectedSplit: any[];
   users: any[];
   cost: number;
 }
@@ -56,28 +58,41 @@ export class SplitSelectionDialog {
   selectAllChecked = false;
   totalAmount: number = 0;
   selectedTabChangeSubscription: Subscription = new Subscription();
-  selectedUsers=[]
+  selectedUsers: any[] = [];
+  selectedSplit: any[] = [];
+  selectedOptions: any[] = [];
   constructor(
     public dialogRef: MatDialogRef<SplitSelectionDialog>,
-    @Inject(MAT_DIALOG_DATA) public data: DialogData
+    @Inject(MAT_DIALOG_DATA) public data: DialogData,
+    private snackbar: MatSnackBar
   ) {}
 
   ngOnInit(): void {
     this.selectedTab = this.data.creation_method === 'equally' ? 0 : 1;
-    this.data.users.forEach((user) => (user.selected = user.owed_share > 0));
+    this.selectedSplit = this.data.selectedSplit || [];
+    if (this.selectedSplit.length === 0) {
+      this.data.users.forEach((user, index) => {
+        this.selectedSplit[index] = {
+          userId: user.id,
+          owed_share: user.owed_share || 0,
+          selected: user.owed_share > 0,
+        };
+      });
+    }
     this.totalAmount = this.data.cost;
     this.remainingPercentage = 100;
     this.onTabChange();
-    this.selectedTabChangeSubscription = this.dialogRef.afterOpened().subscribe(() => {
-      this.onTabChange();
-    });
+    this.selectedTabChangeSubscription = this.dialogRef
+      .afterOpened()
+      .subscribe(() => {
+        this.onTabChange();
+      });
   }
 
   onTabChange(): void {
     if (this.selectedTab == 0) {
-      this.updateEqualSplit(this.data.users.filter((user) => user.selected));
+      this.updateEqualSplit();
     } else {
-      console.log('hi')
       this.updateRemainingAmount();
     }
   }
@@ -107,35 +122,105 @@ export class SplitSelectionDialog {
 
   onConfirm(): void {
     // Confirm button will pass the updated data back to the parent component
-    this.selectedUsers.forEach((user: string) => {
-      this.data.users[0].owed_share = this.equalAmount;
-    });
+    if (this.selectedTab === 0) {
+      // check for equal split
+      if (this.selectedUsers.length === 0) {
+        this.snackbar.open(`Select at least 1 user to split`, 'OK', {
+          duration: 5000,
+          verticalPosition: 'top',
+        });
+        return;
+      }
+      this.selectedSplit
+        .filter((u) => u.selected)
+        .forEach((split) => {
+          split.owed_share = this.equalAmount;
+        });
+    } else {
+      // check for unequal split
+      if (this.remainingAmount !== 0) {
+        this.snackbar.open(
+          `Total owed is ${
+            this.remainingPercentage > 0 ? 'under' : 'over'
+          } by ${this.remainingAmount}`,
+          'OK',
+          {
+            duration: 5000,
+            verticalPosition: 'top',
+          }
+        );
+        return;
+      }
+    }
     this.data.creation_method = this.selectedTab === 0 ? 'equally' : 'unequal';
+    this.data.selectedSplit = this.selectedSplit;
     this.dialogRef.close(this.data);
   }
 
   toggleSelectAll(event: any) {
     this.selectAllChecked = event.checked;
-    this.data.users.forEach((user) => (user.selected = this.selectAllChecked));
-    this.updateEqualSplit(this.data.users.filter((user) => user.selected));
+    this.selectedOptions = event.checked
+      ? this.selectedSplit.map((split) => split.userId)
+      : [];
+    this.onSelectionChange();
   }
 
-  updateEqualSplit(users: any) {
-    this.selectedUsers = users;
+  onSelectionChange() {
+    this.selectedSplit.forEach((split) => {
+      split.selected = new Set(this.selectedOptions).has(split.userId)
+        ? true
+        : false;
+    });
+    this.updateEqualSplit();
+  }
+
+  updateEqualSplit() {
+    this.selectedUsers = this.selectedSplit.filter((split) => split.selected);
     this.equalAmount =
-      this.selectedUsers.length > 0 ? this.data.cost / this.selectedUsers.length : 0;
-    this.selectAllChecked = this.data.users.every((user) => user.selected);
+      this.selectedUsers.length > 0
+        ? this.data.cost / this.selectedUsers.length
+        : 0;
+    this.selectAllChecked = this.selectedSplit.every((split) => split.selected);
   }
 
   getDisplayName(user: any): string {
     return (user.first_name || '') + ' ' + (user.last_name || '') || user.email;
   }
 
+  onChangeInput(event: Event, split: any): void {
+    const inputElement = event.target as HTMLInputElement;
+    let value = inputElement.value;
+
+    // Clean up preceding 0s
+    value = value.replace(/^0+/, '');
+    // Remove all non-numeric characters except for the decimal point.
+    value = value.replace(/[^0-9.]/g, '');
+
+    // Split into parts before and after the decimal point.
+    const [strBeforeDot, strAfterDot] = value.split('.', 2);
+    if (strAfterDot && strAfterDot.length > 2) {
+      value = strBeforeDot + '.' + strAfterDot.substring(0, 2);
+    }
+    // Update the input field and the bound model.
+    inputElement.value = value;
+    this.selectedSplit.forEach((split) => {
+      if (split.userId === split.userId) {
+        split.owed_share = value;
+      }
+    });
+
+    this.updateRemainingAmount();
+  }
+
   updateRemainingAmount() {
-    const totalAllocated = this.data.users.reduce(
-      (sum, user) => sum + (user.owed_share || 0),
-      0
+    const totalAllocated = parseFloat(
+      this.selectedSplit.reduce(
+        (sum, split) => sum + (split.owed_share || 0),
+        0
+      )
+    ).toFixed(2);
+    this.remainingAmount = parseFloat(
+      (this.totalAmount - totalAllocated).toFixed(2)
     );
-    this.remainingAmount = this.totalAmount - totalAllocated;
   }
 }

@@ -4,12 +4,7 @@
     <mat-icon>arrow_back</mat-icon>
   </button>
   <span class="panel-title">Adjust Split</span>
-  <button
-    class="confirm-button"
-    mat-icon-button
-    [mat-dialog-close]="data"
-    (click)="onConfirm()"
-  >
+  <button class="confirm-button" mat-icon-button (click)="onConfirm()">
     <mat-icon>check</mat-icon>
   </button>
 </div>
@@ -29,24 +24,23 @@
           <p>Selected users owe the same amount.</p>
         </div>
         <mat-selection-list
-          (selectionChange)="
-            updateEqualSplit(equalUsers.selectedOptions.selected)
-          "
+          [(ngModel)]="selectedOptions"
+          (selectionChange)="onSelectionChange()"
           #equalUsers
         >
           <mat-list-option
-            *ngFor="let user of data.users"
-            [value]="user"
-            [selected]="user.selected"
+            *ngFor="let split of selectedSplit; let i = index"
+            [selected]="split.selected"
+            [value]="split.userId"
             class="user-option"
           >
             <div class="user-label">
               <img
-                [src]="user.picture?.small"
+                [src]="data.users[i]?.picture?.small"
                 alt="Profile"
                 class="profile-pic"
               />
-              <div>{{ getDisplayName(user) }}</div>
+              <div>{{ getDisplayName(data.users[i]) }}</div>
             </div>
           </mat-list-option>
         </mat-selection-list>
@@ -59,7 +53,7 @@
           <span class="fw-bold"
             >{{ equalAmount | number : "1.2-2" }} /person</span
           >
-          <span>({{ equalUsers.selectedOptions.selected.length }} person)</span>
+          <span>({{ selectedOptions.length }} person)</span>
         </span>
         <mat-checkbox
           [(ngModel)]="selectAllChecked"
@@ -82,23 +76,30 @@
           <p>Specify the exact amount each user owes.</p>
         </div>
         <mat-list>
-          <mat-list-item *ngFor="let user of data.users" class="user-option">
+          <mat-list-item
+            *ngFor="let split of selectedSplit; let i = index"
+            class="user-option"
+          >
             <div class="user-label">
               <img
-                [src]="user.picture?.small"
+                [src]="data.users[i]?.picture?.small"
                 alt="Profile"
                 class="profile-pic"
               />
-              <div>{{ getDisplayName(user) }}</div>
+              <div>{{ getDisplayName(data.users[i]) }}</div>
               <mat-form-field
                 subscriptSizing="dynamic"
                 class="user-amount dense-10"
-                [style.width.px]="(user.owed_share || 0).toString().length * 9 + 40"
+                [style.width.px]="
+                  (split.owed_share || 0).toString().length * 9 + 35
+                "
               >
                 <input
                   matInput
-                  type="number"
-                  [(ngModel)]="user.owed_share"
+                  type="string"
+                  inputmode="numeric"
+                  [(ngModel)]="split.owed_share"
+                  (input)="onChangeInput($event, split.id)"
                   placeholder="0"
                 />
               </mat-form-field>
@@ -112,30 +113,12 @@
           style="flex: 1"
         >
           <span class="fw-bold">
-            SGD{{ totalAmount-remainingAmount | number : "1.2-2" }} of SGD{{
+            SGD{{ totalAmount - remainingAmount | number : "1.2-2" }} of SGD{{
               totalAmount | number : "1.2-2"
             }}
           </span>
-            <span
-              >SGD {{ remainingAmount | number : "1.2-2" }} left</span
-            >
+          <span>SGD {{ remainingAmount | number : "1.2-2" }} left</span>
         </span>
-      </div>
-    </div>
-  </mat-tab>
-
-  <!-- Percentage Tab -->
-  <mat-tab label="Percentage">
-    <div class="tab-content">
-      <h3>Percentage Split</h3>
-      <p>
-        Allocate a percentage for each user, showing the remaining percentage.
-      </p>
-      <div *ngFor="let user of users; let i = index">
-        <mat-form-field appearance="outline">
-          <mat-label>Percentage for {{ user.first_name }}</mat-label>
-          <input matInput type="number" [(ngModel)]="users[i].owed_share" />
-        </mat-form-field>
       </div>
     </div>
   </mat-tab>

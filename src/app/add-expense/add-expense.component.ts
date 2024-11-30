@@ -14,8 +14,9 @@ import { SplitwiseService } from '../splitwise.service';
 import { DatePickerDialogComponent } from '../date-picker-dialog/date-picker-dialog.component';
 
 export interface DialogData {
-  creation_method: 'unequal' | 'equally';
-  users: any[];
+  selectedSplit: any[];
+  creation_method: string;
+  users: User[];
   data: number;
 }
 @Component({
@@ -40,10 +41,10 @@ export class AddExpenseComponent {
   amount: number | null = null;
   payerMapping: Map<number, number> = new Map();
   selectedPayers: User[] = [];
-  selectedSplit = 'equally';
   users: User[] = [];
   selectedDate: Date | null = null;
-
+  selectedSplit: any[] = [];
+  creation_method: string = 'equally';
   constructor(
     private dialog: MatDialog,
     private splitwiseService: SplitwiseService
@@ -62,6 +63,7 @@ export class AddExpenseComponent {
       if (result) {
         this.selectedGroup = result;
         this.users = this.selectedGroup?.members || [];
+        this.selectedSplit = [];
       }
     });
   }
@@ -100,7 +102,8 @@ export class AddExpenseComponent {
       width: '100%',
       height: '100%',
       data: {
-        creation_method: 'equally',
+        selectedSplit: this.selectedSplit,
+        creation_method: this.creation_method,
         users: this.users,
         cost: this.amount,
       },
@@ -109,8 +112,8 @@ export class AddExpenseComponent {
     dialogRef.afterClosed().subscribe((result: DialogData) => {
       if (result) {
         this.users = result.users;
-        console.log('Updated users:', this.users);
-        console.log('Creation method:', result.creation_method);
+        this.selectedSplit = result.selectedSplit;
+        this.creation_method = result.creation_method;
       }
     });
   }
