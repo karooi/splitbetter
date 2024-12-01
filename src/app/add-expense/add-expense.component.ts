@@ -59,7 +59,9 @@ export class AddExpenseComponent {
   }
 
   openGroupDialog() {
-    const dialogRef = this.dialog.open(GroupSelectionDialog);
+    const dialogRef = this.dialog.open(GroupSelectionDialog, {
+      closeOnNavigation: false,
+    });
     dialogRef.afterClosed().subscribe((result) => {
       if (result) {
         this.selectedGroup = result;
@@ -71,7 +73,9 @@ export class AddExpenseComponent {
   }
 
   openCurrencyDialog() {
-    const dialogRef = this.dialog.open(CurrencySelectionDialog);
+    const dialogRef = this.dialog.open(CurrencySelectionDialog, {
+      closeOnNavigation: false,
+    });
     dialogRef.afterClosed().subscribe((result) => {
       if (result) {
         this.selectedCurrency = result;
@@ -81,6 +85,7 @@ export class AddExpenseComponent {
 
   openPayerDialog() {
     const dialogRef = this.dialog.open(PayerSelectionDialogComponent, {
+      closeOnNavigation: false,
       width: '100vw',
       height: '100vh',
       maxWidth: '100vw', // Ensures the dialog doesn't exceed the screen width
@@ -108,6 +113,7 @@ export class AddExpenseComponent {
           : []
         : this.users;
     const dialogRef = this.dialog.open(SplitSelectionDialog, {
+      closeOnNavigation: false,
       maxWidth: '100vw',
       maxHeight: '100vh',
       width: '100%',

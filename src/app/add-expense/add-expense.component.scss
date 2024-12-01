@@ -1,19 +1,29 @@
 .add-expense-container {
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  height: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+
+  .paid-by-split {
     display: flex;
-    flex-direction: column;
-    padding: 16px;
-  
-    .paid-by-split {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-top: 16px;
-    }
-  
-    .footer-icons {
-      display: flex;
-      justify-content: space-around;
-      margin-top: 16px;
-    }
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 16px;
   }
-  
+
+  .footer-icons {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: auto;
+    justify-self: flex-end;
+  }
+  .action-icons {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+}

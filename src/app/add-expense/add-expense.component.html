@@ -26,21 +26,31 @@
   <!-- Paid By and Split Selection -->
   <div class="paid-by-split">
     <span>Paid by</span>
-    <button mat-button (click)="openPayerDialog()">
+    <button mat-stroked-button (click)="openPayerDialog()">
       {{ getSelectedPayers() }}
     </button>
     <span>and split</span>
-    <button mat-button (click)="openSplitDialog()">
+    <button mat-stroked-button (click)="openSplitDialog()">
       {{ creation_method }}
     </button>
   </div>
 
   <!-- Footer Icons (Optional) -->
   <div class="footer-icons">
-    <button mat-icon-button (click)="openDatePicker()">
-      <mat-icon>calendar_today</mat-icon>
+    <div class="action-icons">
+      <button mat-icon-button (click)="openDatePicker()">
+        <mat-icon>calendar_today</mat-icon>
+      </button>
+      <button mat-icon-button disabled>
+        <mat-icon>camera_alt</mat-icon>
+      </button>
+      <button mat-icon-button disabled>
+        <mat-icon>edit</mat-icon>
+      </button>
+    </div>
+    <button mat-fab extended disabled>
+      Add Expense
+      <mat-icon>check</mat-icon>
     </button>
-    <mat-icon>camera_alt</mat-icon>
-    <mat-icon>edit</mat-icon>
   </div>
 </div>

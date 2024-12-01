@@ -1,37 +1,42 @@
-@use '@angular/material' as mat;
-@use '../m3-theme';
+@use "@angular/material" as mat;
+// @use '../m3-theme';
 
 @include mat.core();
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
-
-
-html {
-  // Apply the light theme by default
-  @include mat.core-theme(m3-theme.$light-theme);
-  @include mat.button-theme(m3-theme.$light-theme);
+html,
+body {
+  height: 100%;
 }
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+// html {
+// Apply the light theme by default
+// @include mat.core-theme(m3-theme.$light-theme);
+// @include mat.button-theme(m3-theme.$light-theme);
+// }
 h2 {
   display: inline-block;
   margin: 0;
 }
 
 .mat-mdc-dialog-container {
-    --mdc-dialog-container-shape: 0px;
-  }
+  --mdc-dialog-container-shape: 0px;
+}
 
-  .dense-1 {
-    @include mat.all-component-densities(-1);
-  }
-  
-  .dense-2 {
-    @include mat.all-component-densities(-2);
-  }
-  
-  .dense-3 {
-    @include mat.all-component-densities(-3);
-  }
+.dense-1 {
+  @include mat.all-component-densities(-1);
+}
 
-  .dense-10 {
-    @include mat.all-component-densities(-10);
-  }
+.dense-2 {
+  @include mat.all-component-densities(-2);
+}
+
+.dense-3 {
+  @include mat.all-component-densities(-3);
+}
+
+.dense-10 {
+  @include mat.all-component-densities(-10);
+}
