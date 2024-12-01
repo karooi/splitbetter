@@ -13,7 +13,7 @@
       <mat-optgroup *ngIf="filteredRecents.length > 0" label="Recent">
         @for (currency of filteredRecents ; track currency) {
         <mat-option
-          [value]="currency"
+          [value]="currency.currency_code"
           (onSelectionChange)="selectOption(currency)"
           >{{ currency.currency_code }}</mat-option
         >
@@ -22,7 +22,7 @@
       <mat-optgroup *ngIf="filteredOptions.length > 0" label="All">
         @for (currency of filteredOptions ; track currency) {
         <mat-option
-          [value]="currency"
+          [value]="currency.currency_code"
           (onSelectionChange)="selectOption(currency)"
           >{{ currency.currency_code }}</mat-option
         >

@@ -36,7 +36,9 @@ export class CurrencySelectionDialog {
     this.filteredOptions = this.currencies;
 
     this.myControl.valueChanges.subscribe((value) => {
-      this.filterOptions(value || '');
+      if (value) {
+        this.filterOptions(value);
+      }
     });
   }
 
@@ -51,7 +53,9 @@ export class CurrencySelectionDialog {
       this.filteredOptions = this.currencies;
     });
     this.myControl.valueChanges.subscribe((value) => {
-      this.filterOptions(value || '');
+      if (value) {
+        this.filterOptions(value);
+      }
     });
   }
 
