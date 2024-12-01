@@ -5,7 +5,10 @@
   height: 100%;
   max-width: 400px;
   margin: 0 auto;
-
+  background-color: var(
+    --mat-sidenav-content-background-color,
+    var(--mat-sys-background)
+  );
   .paid-by-split {
     display: flex;
     align-items: center;

@@ -188,7 +188,7 @@ export class SplitSelectionDialog {
     return (user.first_name || '') + ' ' + (user.last_name || '') || user.email;
   }
 
-  onChangeInput(event: Event, split: any): void {
+  onChangeInput(event: Event, userId: any): void {
     const inputElement = event.target as HTMLInputElement;
     let value = inputElement.value;
 
@@ -204,9 +204,9 @@ export class SplitSelectionDialog {
     }
     // Update the input field and the bound model.
     inputElement.value = value;
-    this.selectedSplit.forEach((split) => {
-      if (split.userId === split.userId) {
-        split.owed_share = value;
+    this.selectedSplit.forEach((s) => {
+      if (s.userId === userId) {
+        s.owed_share = value;
       }
     });
 
