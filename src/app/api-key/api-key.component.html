@@ -1,0 +1,18 @@
+<form class="example-form">
+  <mat-form-field class="example-full-width">
+    <mat-label>API Key</mat-label>
+    <input
+      type="text"
+      matInput
+      [(ngModel)]="apiKey"
+      [ngModelOptions]="{ standalone: true }"
+      placeholder="Enter API key"
+      aria-label="API Key"
+    />
+  </mat-form-field>
+
+  <div class="button-container">
+    <button  (click)="onCancel()">Cancel</button>
+    <button  (click)="onOk()">OK</button>
+  </div>
+</form>

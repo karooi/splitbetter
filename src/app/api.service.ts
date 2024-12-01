@@ -11,6 +11,19 @@ export class ApiService {
 
   constructor(private http: HttpClient) {}
 
+  setApiKey(apiKey: string): void {
+    this.apiKey = apiKey;
+    sessionStorage.setItem('apiKey', apiKey);
+  }
+
+  getApiKey(): string {
+    return this.apiKey;
+  }
+
+  initApiKey() {
+    // this.apiKey = sessionStorage.getItem('apiKey') ?? '';
+  }
+
   getHeaders(): HttpHeaders {
     return new HttpHeaders({
       'Content-Type': 'application/x-www-form-urlencoded',

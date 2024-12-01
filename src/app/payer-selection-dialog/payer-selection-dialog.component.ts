@@ -102,8 +102,8 @@ export class PayerSelectionDialogComponent {
     this.updatePayers(this.selectAllChecked ? this.data.users : []);
   }
 
-  getPayerShare(userId: number): number {
-    return this.payerMapping.get(userId) || 0;
+  getPayerShare(userId: number): string {
+    return `${this.payerMapping.get(userId) || 0}`;
   }
 
   setPayerShare(user: User, value: number): void {

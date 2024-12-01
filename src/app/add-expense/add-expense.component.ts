@@ -15,6 +15,7 @@ import { DatePickerDialogComponent } from '../date-picker-dialog/date-picker-dia
 import { CurrencySelectionDialog } from '../currency-selection/currency-selection-dialog.component';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { getParseTreeNode } from 'typescript';
+import { ApiKeyComponent } from '../api-key/api-key.component';
 
 export interface DialogData {
   selectedSplit: any[];
@@ -158,6 +159,13 @@ export class AddExpenseComponent {
       if (result) {
         this.selectedDate = result;
       }
+    });
+  }
+
+  updateApiKey() {
+    this.dialog.open(ApiKeyComponent, {
+      maxWidth: '100vw',
+      width: '95%',
     });
   }
 
