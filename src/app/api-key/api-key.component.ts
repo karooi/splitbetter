@@ -4,7 +4,11 @@ import { ApiService } from '../api.service';
 import { CommonModule } from '@angular/common';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import {
+  MatDialogRef,
+  MAT_DIALOG_DATA,
+  MatDialogActions,
+} from '@angular/material/dialog';
 import { GroupSelectionDialog } from '../group-selection-dialog/group-selection-dialog.component';
 
 @Component({
@@ -15,6 +19,7 @@ import { GroupSelectionDialog } from '../group-selection-dialog/group-selection-
     ReactiveFormsModule,
     MatFormFieldModule,
     MatInputModule,
+    MatDialogActions,
     FormsModule,
   ],
   templateUrl: './api-key.component.html',

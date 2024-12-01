@@ -16,6 +16,7 @@ import { CurrencySelectionDialog } from '../currency-selection/currency-selectio
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { getParseTreeNode } from 'typescript';
 import { ApiKeyComponent } from '../api-key/api-key.component';
+import { ConfirmationComponent } from '../confirmation/confirmation.component';
 
 export interface DialogData {
   selectedSplit: any[];
@@ -175,7 +176,22 @@ export class AddExpenseComponent {
       : 'you';
   }
 
-  addExpense(): void {
+  openConfirmationDialog(): Promise<boolean> {
+    const dialogRef = this.dialog.open(ConfirmationComponent, {
+      width: '250px',
+      data: {
+        header: 'Add expense',
+        message: 'Would you like to add expense?',
+      },
+    });
+
+    return dialogRef.afterClosed().toPromise();
+  }
+
+  async addExpense(): Promise<void> {
+    const confirmed = await this.openConfirmationDialog();
+    if (!confirmed) return;
+
     //check if group is selected
     if (!this.selectedGroup) {
       this.openSnackBar('You must select a group!');
