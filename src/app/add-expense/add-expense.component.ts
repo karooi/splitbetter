@@ -9,10 +9,12 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { User, Group, Currency } from '../models/splitwise.model';
+import { User, Group, Currency, UserExpense } from '../models/splitwise.model';
 import { SplitwiseService } from '../splitwise.service';
 import { DatePickerDialogComponent } from '../date-picker-dialog/date-picker-dialog.component';
 import { CurrencySelectionDialog } from '../currency-selection/currency-selection-dialog.component';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { getParseTreeNode } from 'typescript';
 
 export interface DialogData {
   selectedSplit: any[];
@@ -41,6 +43,7 @@ export class AddExpenseComponent {
   description = '';
   amount: number | null = null;
   payerMapping: Map<number, number> = new Map();
+  payerMultipleSelection: boolean = false;
   selectedPayers: User[] = [];
   users: User[] = [];
   selectedDate: Date | null = null;
@@ -49,7 +52,8 @@ export class AddExpenseComponent {
   selectedCurrency: Currency = { currency_code: 'SGD', unit: 'SGD' };
   constructor(
     private dialog: MatDialog,
-    private splitwiseService: SplitwiseService
+    private splitwiseService: SplitwiseService,
+    private snackbar: MatSnackBar
   ) {}
   ngOnInit(): void {
     this.amount = 100;
@@ -84,6 +88,9 @@ export class AddExpenseComponent {
   }
 
   openPayerDialog() {
+    if (this.getPayerTotal() !== this.amount) {
+      this.resetPayerSetting();
+    }
     const dialogRef = this.dialog.open(PayerSelectionDialogComponent, {
       closeOnNavigation: false,
       width: '100vw',
@@ -93,14 +100,17 @@ export class AddExpenseComponent {
       data: {
         users: this.users,
         cost: this.amount,
+        payerMapping: this.payerMapping,
+        multipleSelection: this.payerMultipleSelection,
       },
     });
     dialogRef.afterClosed().subscribe((result) => {
       if (result) {
-        this.payerMapping = result;
+        this.payerMapping = new Map(result.payerMapping);
         this.selectedPayers = this.users.filter((user) =>
           this.payerMapping.has(user.id)
         );
+        this.payerMultipleSelection = result.multipleSelection;
       }
     });
   }
@@ -155,5 +165,131 @@ export class AddExpenseComponent {
     return this.selectedPayers.length > 0
       ? this.selectedPayers.map((payer) => payer.first_name).join(',')
       : 'you';
+  }
+
+  addExpense(): void {
+    //check if group is selected
+    if (!this.selectedGroup) {
+      this.openSnackBar('You must select a group!');
+    }
+
+    //check if description is not empty
+    if (this.description.length === 0) {
+      this.openSnackBar('Description cannot be empty!');
+      return;
+    }
+    //check if the payment already added up to total
+    if (!this.checkPayer()) {
+      this.openSnackBar('Payment not adding up total!');
+      return;
+    }
+    //check if the split already added up to total
+    if (!this.checkSplit()) {
+      this.openSnackBar('Split not adding up total!');
+      return;
+    }
+    //if the date is empty, choose current date
+    if (!this.selectedDate) {
+      this.selectedDate = new Date();
+    }
+    //if both payment and split are equally
+    // if (!this.payerMultipleSelection && this.creation_method === 'equally') {
+    //   this.splitwiseService
+    //     .createExpenseEqually(
+    //       this.amount ?? 0,
+    //       this.description,
+    //       this.selectedGroup?.id ?? 0,
+    //       this.selectedDate?.toISOString(),
+    //       this.selectedCurrency.currency_code
+    //     )
+    //     .subscribe((data) => {
+    //       console.log('expense added!');
+    //       console.log(data);
+    //     });
+    // } else {
+    const userExpenseMap = new Map<number, UserExpense>();
+
+    this.users.forEach((user) => {
+      userExpenseMap.set(user.id, { paid_share: 0, owed_share: 0 });
+    });
+    this.setPaidShare(userExpenseMap);
+    this.setSplitShare(userExpenseMap);
+
+    this.splitwiseService
+      .createExpense(
+        this.amount ?? 0,
+        this.description,
+        this.selectedGroup?.id ?? 0,
+        this.selectedDate?.toISOString(),
+        this.selectedCurrency.currency_code,
+        userExpenseMap
+      )
+      .subscribe((data) => {
+        console.log('expense added!');
+        console.log(data);
+      });
+    // }
+  }
+  setSplitShare(userExpenseMap: Map<number, UserExpense>) {
+    const equalAmount: number = this.amount ?? 0 / this.selectedSplit.length;
+    this.selectedSplit.forEach((split) => {
+      const userExpense = userExpenseMap.get(split.userId);
+      if (userExpense) {
+        userExpense.owed_share =
+          this.creation_method !== 'equally' ? split.owed_share : equalAmount;
+      }
+    });
+  }
+  setPaidShare(userExpenseMap: Map<number, UserExpense>) {
+    const equalAmount: number = this.amount ?? 0 / this.payerMapping.size;
+    this.payerMapping.forEach((paidShare, id) => {
+      const userExpense = userExpenseMap.get(id);
+      if (userExpense) {
+        userExpense.paid_share = this.payerMultipleSelection
+          ? paidShare
+          : equalAmount;
+      }
+    });
+  }
+
+  checkSplit(): boolean {
+    if (this.selectedSplit.length === 0) return false;
+    if (this.creation_method !== 'equally') {
+      let total = 0;
+      this.selectedSplit.forEach((split) => {
+        total += split.owed_share;
+      });
+      if (total !== this.amount) return false;
+    }
+    return true;
+  }
+
+  getPayerTotal(): number {
+    let total = 0;
+    this.payerMapping.forEach((value) => {
+      total += value;
+    });
+    return total;
+  }
+
+  checkPayer(): boolean {
+    if (this.payerMapping.size === 0) return false;
+    //if the selection for payer is not equally method
+    if (this.payerMultipleSelection) {
+      if (this.getPayerTotal() !== this.amount) return false;
+    }
+    return true;
+  }
+
+  openSnackBar(message: string): void {
+    this.snackbar.open(message, 'OK', {
+      duration: 5000,
+      verticalPosition: 'top',
+    });
+    return;
+  }
+  resetPayerSetting(): void {
+    this.payerMapping = new Map();
+    this.payerMultipleSelection = false;
   }
 }

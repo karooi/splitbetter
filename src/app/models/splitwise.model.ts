@@ -82,3 +82,7 @@ export interface Currency {
   unit: string;
 }
 
+export interface UserExpense {
+  paid_share: number;
+  owed_share: number;
+}

@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { ApiService } from './api.service';
 import { HttpHeaders } from '@angular/common/http';
+import { UserExpense } from './models/splitwise.model';
 
 @Injectable({
   providedIn: 'root',
@@ -42,22 +43,65 @@ export class SplitwiseService {
     );
   }
 
-  createExpense(
+  createExpenseEqually(
     cost: number,
     description: string,
     groupId: number,
-    users: Array<{ user_id: number; paid_share: number; owed_share: number }>
+    date: string,
+    currencyCode: string
   ): Observable<any> {
     const expenseData = {
       cost: cost.toFixed(2),
       description,
       group_id: groupId,
-      users,
+      date,
+      split_equally: true,
+      currency_code: currencyCode,
     };
     return this.apiService.post(
       `${this.apiUrl}create_expense`,
       expenseData,
-      this.apiService.getHeaders()
+      this.apiService.getJsonHeaders()
+    );
+  }
+
+  addUsersToExpenseData(
+    expenseData: any,
+    userExpenseMap: Map<number, UserExpense>
+  ): any {
+    let index = 0;
+
+    userExpenseMap.forEach((expense, userId) => {
+      expenseData[`users__${index}__user_id`] = userId;
+      expenseData[`users__${index}__paid_share`] =
+        expense.paid_share.toFixed(2);
+      expenseData[`users__${index}__owed_share`] =
+        expense.owed_share.toFixed(2);
+      index++;
+    });
+
+    return expenseData;
+  }
+
+  createExpense(
+    cost: number,
+    description: string,
+    groupId: number,
+    date: string,
+    currencyCode: string,
+    userExpenseMap: Map<number, UserExpense>
+  ): Observable<any> {
+    const expenseData = {
+      cost: cost.toFixed(2),
+      description,
+      group_id: groupId,
+      date,
+      currency_code: currencyCode,
+    };
+    return this.apiService.post(
+      `${this.apiUrl}create_expense`,
+      this.addUsersToExpenseData(expenseData, userExpenseMap),
+      this.apiService.getJsonHeaders()
     );
   }
 

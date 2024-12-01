@@ -18,6 +18,13 @@ export class ApiService {
     });
   }
 
+  getJsonHeaders(): HttpHeaders {
+    return new HttpHeaders({
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${this.apiKey}`,
+    });
+  }
+
   private handleError(error: any): Observable<never> {
     console.error('API Error:', error);
     return throwError(() => new Error(error.message || 'Server Error'));

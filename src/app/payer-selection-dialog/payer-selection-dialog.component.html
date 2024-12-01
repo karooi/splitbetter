@@ -6,7 +6,6 @@
   <button
     class="confirm-button"
     mat-icon-button
-    [mat-dialog-close]="data"
     (click)="onConfirm()"
   >
     <mat-icon>check</mat-icon>
@@ -48,9 +47,6 @@
         <span class="fw-bold"
           >{{ payers.selectedOptions.selected.length === 0 ? 0 :  this.data.cost/payers.selectedOptions.selected.length | number : "1.2-2" }} /person</span
         >
-        <span class="fw-bold"
-          >1 /person</span
-        >
         <span>({{ payers.selectedOptions.selected.length }} person)</span>
       </span>
       <mat-checkbox
@@ -79,11 +75,12 @@
             <mat-form-field
               subscriptSizing="dynamic"
               class="user-amount dense-10"
-              [style.width.px]="(user.owed_share || 0).toString().length * 9 + 40"
+              [style.width.px]="(payerMapping.get(user.id) || 0).toString().length * 9 + 40"
             >
               <input
                 matInput
                 type="number"
+                [id]="'input-' + user.id"
                 [ngModel]="getPayerShare(user.id)"
                 (ngModelChange)="setPayerShare(user, $event)"
                 placeholder="0"
