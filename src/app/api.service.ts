@@ -13,7 +13,7 @@ export class ApiService {
 
   setApiKey(apiKey: string): void {
     this.apiKey = apiKey;
-    sessionStorage.setItem('apiKey', apiKey);
+    localStorage.setItem('apiKey', apiKey);
   }
 
   getApiKey(): string {
@@ -21,7 +21,7 @@ export class ApiService {
   }
 
   initApiKey() {
-    // this.apiKey = sessionStorage.getItem('apiKey') ?? '';
+    this.apiKey = localStorage.getItem('apiKey') ?? '';
   }
 
   getHeaders(): HttpHeaders {

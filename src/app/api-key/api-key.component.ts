@@ -4,6 +4,8 @@ import { ApiService } from '../api.service';
 import { CommonModule } from '@angular/common';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { MatButtonModule } from '@angular/material/button';
+
 import {
   MatDialogRef,
   MAT_DIALOG_DATA,
@@ -20,6 +22,7 @@ import { GroupSelectionDialog } from '../group-selection-dialog/group-selection-
     MatFormFieldModule,
     MatInputModule,
     MatDialogActions,
+    MatButtonModule,
     FormsModule,
   ],
   templateUrl: './api-key.component.html',
@@ -37,10 +40,6 @@ export class ApiKeyComponent {
 
   ngOnInit() {
     this.apiKey = this.apiService.getApiKey();
-  }
-
-  onCancel(): void {
-    this.dialogRef.close();
   }
 
   onOk(): void {

@@ -41,7 +41,7 @@ export class GroupSelectionDialog {
   }
 
   ngOnInit() {
-    const storedGroups = sessionStorage.getItem('groups');
+    const storedGroups = localStorage.getItem('groups');
     if (storedGroups) {
       this.groups = JSON.parse(storedGroups);
       this.filteredOptions = this.groups;
@@ -50,7 +50,7 @@ export class GroupSelectionDialog {
     this.splitwiseService.getGroups().subscribe((data) => {
       this.groups = data.groups;
       this.filteredOptions = this.groups;
-      sessionStorage.setItem('groups', JSON.stringify(this.groups));
+      localStorage.setItem('groups', JSON.stringify(this.groups));
     });
 
     this.myControl.valueChanges.subscribe((value) => {

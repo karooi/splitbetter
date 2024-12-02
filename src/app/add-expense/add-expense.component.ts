@@ -17,6 +17,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { getParseTreeNode } from 'typescript';
 import { ApiKeyComponent } from '../api-key/api-key.component';
 import { ConfirmationComponent } from '../confirmation/confirmation.component';
+import { ApiService } from '../api.service';
 
 export interface DialogData {
   selectedSplit: any[];
@@ -55,9 +56,13 @@ export class AddExpenseComponent {
   constructor(
     private dialog: MatDialog,
     private splitwiseService: SplitwiseService,
-    private snackbar: MatSnackBar
+    private snackbar: MatSnackBar,
+    private apiService: ApiService
   ) {}
   ngOnInit(): void {
+    if (this.apiService.getApiKey().length === 0) {
+      this.updateApiKey();
+    }
     this.amount = 100;
     this.splitwiseService.getCurrentUser().subscribe((data) => {
       this.currentUser = data.user;
@@ -74,6 +79,7 @@ export class AddExpenseComponent {
         this.users = this.selectedGroup?.members || [];
         //reset selected split
         this.selectedSplit = [];
+        this.resetPayerSetting();
       }
     });
   }
@@ -189,9 +195,6 @@ export class AddExpenseComponent {
   }
 
   async addExpense(): Promise<void> {
-    const confirmed = await this.openConfirmationDialog();
-    if (!confirmed) return;
-
     //check if group is selected
     if (!this.selectedGroup) {
       this.openSnackBar('You must select a group!');
@@ -216,21 +219,9 @@ export class AddExpenseComponent {
     if (!this.selectedDate) {
       this.selectedDate = new Date();
     }
-    //if both payment and split are equally
-    // if (!this.payerMultipleSelection && this.creation_method === 'equally') {
-    //   this.splitwiseService
-    //     .createExpenseEqually(
-    //       this.amount ?? 0,
-    //       this.description,
-    //       this.selectedGroup?.id ?? 0,
-    //       this.selectedDate?.toISOString(),
-    //       this.selectedCurrency.currency_code
-    //     )
-    //     .subscribe((data) => {
-    //       console.log('expense added!');
-    //       console.log(data);
-    //     });
-    // } else {
+    const confirmed = await this.openConfirmationDialog();
+    if (!confirmed) return;
+
     const userExpenseMap = new Map<number, UserExpense>();
 
     this.users.forEach((user) => {
@@ -252,7 +243,6 @@ export class AddExpenseComponent {
         console.log('expense added!');
         console.log(data);
       });
-    // }
   }
   setSplitShare(userExpenseMap: Map<number, UserExpense>) {
     const equalAmount: number = this.amount ?? 0 / this.selectedSplit.length;
@@ -260,7 +250,7 @@ export class AddExpenseComponent {
       const userExpense = userExpenseMap.get(split.userId);
       if (userExpense) {
         userExpense.owed_share =
-          this.creation_method !== 'equally' ? split.owed_share : equalAmount;
+          this.creation_method !== 'equally' ? +split.owed_share : equalAmount;
       }
     });
   }
@@ -278,10 +268,11 @@ export class AddExpenseComponent {
 
   checkSplit(): boolean {
     if (this.selectedSplit.length === 0) return false;
+    console.log(this.selectedSplit);
     if (this.creation_method !== 'equally') {
       let total = 0;
       this.selectedSplit.forEach((split) => {
-        total += split.owed_share;
+        total += +split.owed_share;
       });
       if (total !== this.amount) return false;
     }
