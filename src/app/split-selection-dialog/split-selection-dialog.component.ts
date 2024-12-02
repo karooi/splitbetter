@@ -1,4 +1,4 @@
-import { Component, Inject, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, Inject, ViewChild } from '@angular/core';
 import {
   MAT_DIALOG_DATA,
   MatDialogModule,
@@ -51,8 +51,7 @@ export interface DialogData {
   styleUrls: ['./split-selection-dialog.component.scss'],
 })
 export class SplitSelectionDialog {
-  remainingAmount = 100; // Example remaining amount for the Unequal tab
-  remainingPercentage = 100;
+  remainingAmount: number = 0; // Example remaining amount for the Unequal tab
   equalAmount: number = 0;
   selectedTab: number = 0;
   selectAllChecked = false;
@@ -64,7 +63,8 @@ export class SplitSelectionDialog {
   constructor(
     public dialogRef: MatDialogRef<SplitSelectionDialog>,
     @Inject(MAT_DIALOG_DATA) public data: DialogData,
-    private snackbar: MatSnackBar
+    private snackbar: MatSnackBar,
+    private cdref: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -79,23 +79,12 @@ export class SplitSelectionDialog {
         };
       });
     }
-    this.totalAmount = this.data.cost;
-    this.remainingPercentage = 100;
-    this.onTabChange();
-    this.selectedTabChangeSubscription = this.dialogRef
-      .afterOpened()
-      .subscribe(() => {
-        this.onTabChange();
-      });
+    this.totalAmount = this.data.cost || 0;
+    this.remainingAmount = this.totalAmount;
+    this.updateEqualSplit();
+    this.updateRemainingAmount();
   }
 
-  onTabChange(): void {
-    if (this.selectedTab == 0) {
-      this.updateEqualSplit();
-    } else {
-      this.updateRemainingAmount();
-    }
-  }
   get users() {
     return this.data.users;
   }
@@ -140,9 +129,9 @@ export class SplitSelectionDialog {
       // check for unequal split
       if (this.remainingAmount !== 0) {
         this.snackbar.open(
-          `Total owed is ${
-            this.remainingPercentage > 0 ? 'under' : 'over'
-          } by ${this.remainingAmount}`,
+          `Total owed is ${this.remainingAmount > 0 ? 'under' : 'over'} by ${
+            this.remainingAmount
+          }`,
           'OK',
           {
             duration: 5000,
@@ -188,7 +177,7 @@ export class SplitSelectionDialog {
     return (user.first_name || '') + ' ' + (user.last_name || '') || user.email;
   }
 
-  onChangeInput(event: Event, userId: any): void {
+  onChangeInput(event: Event, index: any): void {
     const inputElement = event.target as HTMLInputElement;
     let value = inputElement.value;
 
@@ -196,20 +185,22 @@ export class SplitSelectionDialog {
     value = value.replace(/^0+/, '');
     // Remove all non-numeric characters except for the decimal point.
     value = value.replace(/[^0-9.]/g, '');
+    if (value.includes('.')) {
+      // Split into parts before and after the decimal point.
+      let [strBeforeDot, strAfterDot] = value.split('.', 2);
+      // Add a zero before the decimal point if not existing.
+      strBeforeDot = strBeforeDot ? strBeforeDot : '0';
 
-    // Split into parts before and after the decimal point.
-    const [strBeforeDot, strAfterDot] = value.split('.', 2);
-    if (strAfterDot && strAfterDot.length > 2) {
-      value = strBeforeDot + '.' + strAfterDot.substring(0, 2);
+      if (strAfterDot && strAfterDot.length > 2) {
+        strAfterDot = strAfterDot.substring(0, 2);
+      }
+      strAfterDot = strAfterDot ? strAfterDot : '';
+      value = strBeforeDot + '.' + strAfterDot;
     }
+
     // Update the input field and the bound model.
     inputElement.value = value;
-    this.selectedSplit.forEach((s) => {
-      if (s.userId === userId) {
-        s.owed_share = value;
-      }
-    });
-
+    this.selectedSplit[index].owed_share = value;
     this.updateRemainingAmount();
   }
 
@@ -222,5 +213,6 @@ export class SplitSelectionDialog {
     this.remainingAmount = parseFloat(
       (this.totalAmount - totalAllocated).toFixed(2)
     );
+    this.cdref.detectChanges();
   }
 }

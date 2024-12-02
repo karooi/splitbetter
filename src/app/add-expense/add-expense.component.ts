@@ -63,7 +63,6 @@ export class AddExpenseComponent {
     if (this.apiService.getApiKey().length === 0) {
       this.updateApiKey();
     }
-    this.amount = 100;
     this.splitwiseService.getCurrentUser().subscribe((data) => {
       this.currentUser = data.user;
     });
@@ -245,12 +244,18 @@ export class AddExpenseComponent {
       });
   }
   setSplitShare(userExpenseMap: Map<number, UserExpense>) {
-    const equalAmount: number = this.amount ?? 0 / this.selectedSplit.length;
+    this.amount = this.amount || 0;
+    const equalAmount: number =
+      this.amount / this.selectedSplit.filter((split) => split.selected).length;
     this.selectedSplit.forEach((split) => {
       const userExpense = userExpenseMap.get(split.userId);
       if (userExpense) {
         userExpense.owed_share =
-          this.creation_method !== 'equally' ? +split.owed_share : equalAmount;
+          this.creation_method !== 'equally'
+            ? +split.owed_share
+            : split.selected
+            ? equalAmount
+            : 0;
       }
     });
   }
@@ -268,7 +273,6 @@ export class AddExpenseComponent {
 
   checkSplit(): boolean {
     if (this.selectedSplit.length === 0) return false;
-    console.log(this.selectedSplit);
     if (this.creation_method !== 'equally') {
       let total = 0;
       this.selectedSplit.forEach((split) => {
@@ -288,7 +292,11 @@ export class AddExpenseComponent {
   }
 
   checkPayer(): boolean {
-    if (this.payerMapping.size === 0) return false;
+    if (this.payerMapping.size === 0) {
+      // default to current user as payee
+      this.payerMapping.set(this.currentUser?.id ?? 0, this.amount ?? 0);
+      return true;
+    }
     //if the selection for payer is not equally method
     if (this.payerMultipleSelection) {
       if (this.getPayerTotal() !== this.amount) return false;
@@ -306,5 +314,28 @@ export class AddExpenseComponent {
   resetPayerSetting(): void {
     this.payerMapping = new Map();
     this.payerMultipleSelection = false;
+  }
+  onChangeInput(event: Event): void {
+    const inputElement = event.target as HTMLInputElement;
+    let value = inputElement.value;
+
+    // Clean up preceding 0s
+    value = value.replace(/^0+/, '');
+    // Remove all non-numeric characters except for the decimal point.
+    value = value.replace(/[^0-9.]/g, '');
+    if (value.includes('.')) {
+      // Split into parts before and after the decimal point.
+      let [strBeforeDot, strAfterDot] = value.split('.', 2);
+      // Add a zero before the decimal point if not existing.
+      strBeforeDot = strBeforeDot ? strBeforeDot : '0';
+
+      if (strAfterDot && strAfterDot.length > 2) {
+        strAfterDot = strAfterDot.substring(0, 2);
+      }
+      strAfterDot = strAfterDot ? strAfterDot : '';
+      value = strBeforeDot + '.' + strAfterDot;
+    }
+    inputElement.value = value;
+    this.amount = parseFloat(value);
   }
 }

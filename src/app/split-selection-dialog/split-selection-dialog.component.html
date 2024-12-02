@@ -98,8 +98,8 @@
                   matInput
                   type="string"
                   inputmode="numeric"
-                  [(ngModel)]="split.owed_share"
-                  (input)="onChangeInput($event, split.id)"
+                  [value]="split.owed_share"
+                  (input)="onChangeInput($event, i)"
                   placeholder="0"
                 />
               </mat-form-field>

@@ -19,7 +19,14 @@
 
   <!-- Amount Input -->
   <mat-form-field appearance="fill">
-    <input matInput type="number" [(ngModel)]="amount" placeholder="0.00" />
+    <input
+      matInput
+      type="string"
+      inputmode="numeric"
+      [value]="amount"
+      (input)="onChangeInput($event)"
+      placeholder="0.00"
+    />
     <button mat-button (click)="openCurrencyDialog()" matSuffix>
       {{ selectedCurrency.currency_code }}
     </button>
