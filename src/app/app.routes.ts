@@ -1,12 +1,16 @@
 import { Routes } from '@angular/router';
 import { AppComponent } from './app.component';
-import { CanActivateChildGuard } from './can-activate-child.gaurd';
+import { canActivateFn } from './can-activate-child.gaurd';
 
 export const routes: Routes = [
   {
     path: '',
-    pathMatch: 'full',
-    canActivateChild: [CanActivateChildGuard],
+    canActivate: [canActivateFn],
+    component: AppComponent,
+  },
+  {
+    path: 'login',
+    canActivate: [canActivateFn],
     component: AppComponent,
   },
   { path: '**', redirectTo: '' },

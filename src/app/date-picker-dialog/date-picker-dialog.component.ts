@@ -18,6 +18,7 @@ import {
 } from '@angular/material/core';
 import { MatCard } from '@angular/material/card';
 import { MatIcon } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
 
 @Component({
   selector: 'app-date-picker-dialog',
@@ -25,7 +26,13 @@ import { MatIcon } from '@angular/material/icon';
   styleUrls: ['./date-picker-dialog.component.scss'],
   standalone: true,
   providers: [provideNativeDateAdapter()],
-  imports: [MatDialogModule, MatDatepickerModule, MatNativeDateModule, MatIcon],
+  imports: [
+    MatDialogModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
+    MatButtonModule,
+    MatIcon,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DatePickerDialogComponent {
