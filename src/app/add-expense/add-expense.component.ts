@@ -18,6 +18,7 @@ import { getParseTreeNode } from 'typescript';
 import { ApiKeyComponent } from '../api-key/api-key.component';
 import { ConfirmationComponent } from '../confirmation/confirmation.component';
 import { ApiService } from '../api.service';
+import { Router } from '@angular/router';
 
 export interface DialogData {
   selectedSplit: any[];
@@ -57,15 +58,28 @@ export class AddExpenseComponent {
     private dialog: MatDialog,
     private splitwiseService: SplitwiseService,
     private snackbar: MatSnackBar,
-    private apiService: ApiService
+    private apiService: ApiService,
+    private router: Router
   ) {}
   ngOnInit(): void {
-    if (this.apiService.getApiKey().length === 0) {
-      this.updateApiKey();
-    }
-    this.splitwiseService.getCurrentUser().subscribe((data) => {
-      this.currentUser = data.user;
+    this.splitwiseService.getCurrentUser().subscribe({
+      next: (data) => {
+        if (data?.user) {
+          this.currentUser = data.user;
+        } else {
+          this.handleInvalidData();
+        }
+      },
+      error: (err) => {
+        console.error('Error fetching current user:', err);
+        this.handleInvalidData();
+      },
     });
+  }
+
+  private handleInvalidData(): void {
+    this.apiService.clearApiKey(); // Clear the API key
+    this.router.navigate(['/welcome']); // Navigate to the welcome page
   }
 
   openGroupDialog() {

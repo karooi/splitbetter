@@ -2,13 +2,14 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
+import { SplitwiseService } from './splitwise.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ApiService {
-  private apiKey = '968STYA948sCJsvkihh2RTDpN3E3SqieE0Vod5Pd';
-
+  private apiKey = '';
+  // private apiKey = '968STYA948sCJsvkihh2RTDpN3E3SqieE0Vod5Pd';
   constructor(private http: HttpClient) {}
 
   setApiKey(apiKey: string): void {
@@ -22,6 +23,10 @@ export class ApiService {
 
   initApiKey() {
     this.apiKey = localStorage.getItem('apiKey') ?? '';
+  }
+
+  clearApiKey(): any {
+    localStorage.removeItem('apiKey');
   }
 
   getHeaders(): HttpHeaders {
