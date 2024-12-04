@@ -1,5 +1,5 @@
 <div class="add-expense-container">
-  <h2 class="app-name">
+  <h2 class="app-name m-5">
     <span>Split</span><span class="secondary-text">Better</span>
   </h2>
 
@@ -9,16 +9,17 @@
   </button>
 
   <!-- Description Input -->
-  <mat-form-field appearance="fill">
+  <mat-form-field appearance="fill" class="max-width-340px">
     <input
       matInput
       [(ngModel)]="description"
       placeholder="Enter a description"
+      q
     />
   </mat-form-field>
 
   <!-- Amount Input -->
-  <mat-form-field appearance="fill">
+  <mat-form-field appearance="fill" class="max-width-340px">
     <input
       matInput
       type="string"
