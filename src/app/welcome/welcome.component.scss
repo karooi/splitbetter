@@ -1,0 +1,24 @@
+.add-expense-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16px;
+  height: 100%;
+  background-color: var(
+    --mat-sidenav-content-background-color,
+    var(--mat-sys-background)
+  );
+  .app-name {
+    font-family: "Lobster", cursive;
+    font-weight: 700;
+    color: #514346;
+    letter-spacing: 0.02em;
+    .secondary-text {
+      color: #ba005c;
+    }
+  }
+  .max-width-340px {
+    max-width: 340px;
+    width: 340px;
+  }
+}

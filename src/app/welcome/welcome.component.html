@@ -1,0 +1,20 @@
+<div class="add-expense-container">
+  <h2 class="app-name m-5">
+    <span>Split</span><span class="secondary-text">Better</span>
+  </h2>
+  <h4>Welcome</h4>
+  <mat-form-field class="max-width-340px">
+    <mat-label>API Key</mat-label>
+    <input
+      required
+      type="text"
+      matInput
+      [(ngModel)]="apiKey"
+      [ngModelOptions]="{ standalone: true }"
+      aria-label="API Key"
+    />
+  </mat-form-field>
+  <button class="max-width-340px" mat-flat-button (click)="onSubmit()">
+    Submit
+  </button>
+</div>
